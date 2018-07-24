@@ -1,0 +1,24 @@
+# OS
+
+## Toolchain
+
+The following libraries are required to build GCC
+
+- GMP
+- MPFR
+- MPC
+
+
+### Debian Prerequisities
+
+Tested on Debian GNU/Linux 9 (stretch)
+
+```
+sudo apt install libgmp-dev libmpfr-dev libmpc-dev
+```
+
+### Building
+
+```
+make toolchain -j 16
+```

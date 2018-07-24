@@ -1,4 +1,7 @@
-toolchain/binutils*
 toolchain/bin/
+toolchain/binutils*
+toolchain/gcc*
 toolchain/i386-elf
+toolchain/lib/
+toolchain/libexec/
 toolchain/share/
