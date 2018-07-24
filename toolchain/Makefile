@@ -16,6 +16,7 @@ all: binutils
 
 binutils: $(BINUTILS_PATH)/Makefile $(BINUTILS_PATH)
 	make -C $(BINUTILS_PATH)
+	make -C $(BINUTILS_PATH) install
 
 $(BINUTILS_PATH)/Makefile: $(BINUTILS_PATH)/configure
 	cd $(BINUTILS_PATH); \

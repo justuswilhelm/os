@@ -1,1 +1,4 @@
 toolchain/binutils*
+toolchain/bin/
+toolchain/i386-elf
+toolchain/share/
