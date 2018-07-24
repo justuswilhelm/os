@@ -1,7 +1,13 @@
+*.bin
+*.o
+*.tar.gz
 toolchain/bin/
-toolchain/binutils*
-toolchain/gcc*
+toolchain/binutils-*/
+toolchain/gcc-*/
 toolchain/i386-elf
 toolchain/lib/
 toolchain/libexec/
 toolchain/share/
+toolchain/etc/
+toolchain/grub-*/
+toolchain/sbin/

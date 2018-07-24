@@ -9,6 +9,13 @@ The following libraries are required to build GCC
 - MPC
 
 
+### macOS Prerequisites
+
+```
+brew tap hawkw/homebrew-grub
+brew install objconv
+```
+
 ### Debian Prerequisities
 
 Tested on Debian GNU/Linux 9 (stretch)
