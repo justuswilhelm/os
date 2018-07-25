@@ -46,6 +46,8 @@ $(GCC_PATH)/Makefile: $(GCC_PATH)/configure
 			--target=$(TARGET) \
 			--disable-nls \
 			--enable-languages=c \
+			--enable-multilib \
+			--with-system-zlib \
 			--without-headers
 
 $(GCC_PATH)/configure: $(GCC_AR)

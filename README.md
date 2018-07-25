@@ -14,7 +14,7 @@ The following libraries are required to build GCC
 Tested on Debian GNU/Linux 9 (stretch)
 
 ```
-sudo apt install libgmp-dev libmpfr-dev libmpc-dev
+sudo apt install libgmp-dev libmpfr-dev libmpc-dev zlib1g-dev
 ```
 
 ### Building
