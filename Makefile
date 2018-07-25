@@ -4,6 +4,10 @@ AS = toolchain/bin/i386-elf-as
 
 SRC_PATH = src
 
+OBJS = \
+	boot.o \
+	kernel.o \
+
 .PHONY: toolchain
 
 all: os.bin
@@ -11,14 +15,14 @@ all: os.bin
 boot.o: boot.s
 	$(CC) $(CC_FLAG) -c $< -o $@
 
-kernel.o: kernel.c
+%.o: %.c
 	$(CC) $(CC_FLAG) -c $< -o $@
 
-os.bin: linker.ld boot.o kernel.o
-	$(CC) $(CC_FLAG) -T $< boot.o kernel.o -o $@ -nostdlib -lgcc
+os.bin: linker.ld $(OBJS)
+	$(CC) $(CC_FLAG) -T $< $(OBJS) -o $@ -nostdlib -lgcc
 
 toolchain:
 	make -C toolchain all
 
 clean:
-	rm *.o
+	rm -f $(OBJS)
