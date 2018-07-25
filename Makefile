@@ -12,6 +12,9 @@ OBJS = \
 
 all: os.bin
 
+qemu: os.bin
+	qemu-system-i386 -kernel $<
+
 boot.o: boot.s
 	$(CC) $(CC_FLAG) -c $< -o $@
 
