@@ -29,3 +29,4 @@ toolchain:
 
 clean:
 	rm -f $(OBJS)
+	make -C toolchain clean
