@@ -29,3 +29,6 @@ toolchain:
 
 clean:
 	rm -f $(OBJS)
+
+format:
+	clang-format -i *.c
