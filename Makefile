@@ -1,4 +1,4 @@
-CC_FLAG = -std=gnu99 -ffreestanding -g
+CC_FLAG = -std=gnu99 -ffreestanding -g -Wall -Wextra -Werror
 CC = toolchain/bin/i386-elf-gcc
 AS = toolchain/bin/i386-elf-as
 
