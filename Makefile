@@ -6,6 +6,8 @@ SRC_PATH = src
 
 SRCS = \
 	main.c \
+	ports.c \
+	screen.c \
 
 OBJS = \
 	boot.o \

@@ -1,3 +1,4 @@
+#pragma once
 #include <stdint.h>
 
 // Multiboot struct taken from
