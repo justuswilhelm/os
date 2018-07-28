@@ -20,4 +20,5 @@ void screen_put(const uint8_t c);
 void screen_clear();
 
 // Output a null-terminated ASCII string to the monitor.
-void screen_puts(const char *c);
+void screen_puts(const uint8_t *c);
+void screen_printf(const uint8_t *c, va_list args);

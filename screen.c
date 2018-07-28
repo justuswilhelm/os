@@ -25,11 +25,6 @@ static void screen_set_cursor(size_t x, size_t y) {
   outb(0x3D5, location);
 }
 
-void screen_put(const uint8_t c) {
-  const size_t index = screen_x + screen_y * SCREEN_WIDTH;
-  vga_buffer[index] = ((uint16_t)0x0F << 8) | c;
-}
-
 static void check_scrollback() {
   if ((screen_y) >= (SCREEN_HEIGHT)) {
     for (size_t x = 0; x < VGA_BUFFER_SIZE; x++) {
@@ -52,23 +47,28 @@ static void scroll() {
   screen_set_cursor(screen_x, screen_y);
 }
 
-void screen_puts(const char *str) {
+void screen_puts(const uint8_t *str) {
   for (size_t i = 0; str[i] != '\0'; i++) {
-    char c = str[i];
-    switch (c) {
-    case '\n':
-      scroll();
-      break;
-    default:
-      screen_put(c);
-      screen_x++;
-      if (screen_x >= SCREEN_WIDTH) {
-        scroll();
-      }
-      break;
-    }
+    uint8_t c = str[i];
+    screen_put(c);
   }
   screen_set_cursor(screen_x, screen_y);
+}
+
+void screen_put(const uint8_t c) {
+  const size_t index = screen_x + screen_y * SCREEN_WIDTH;
+  switch (c) {
+  case '\n':
+    scroll();
+    break;
+  default:
+    vga_buffer[index] = ((uint16_t)0x0F << 8) | c;
+    screen_x++;
+    if (screen_x >= SCREEN_WIDTH) {
+      scroll();
+    }
+    break;
+  }
 }
 
 void screen_clear() {
