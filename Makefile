@@ -4,16 +4,27 @@ AS = toolchain/bin/i386-elf-as
 
 SRC_PATH = src
 
+SRCS = \
+	main.c \
+
 OBJS = \
 	boot.o \
-	main.o \
+	$(patsubst %.c,%.o,$(SRCS)) \
 
-.PHONY: toolchain
+.PHONY: toolchain depend
 
 all: os.bin
 
 qemu: os.bin
 	qemu-system-i386 -kernel $<
+
+depend: .depend
+
+.depend: $(SRCS)
+	rm -f ./.depend
+	$(CC) $(CFLAGS) -MM $^ -MF  ./.depend
+
+include .depend
 
 boot.o: boot.s
 	$(CC) $(CC_FLAG) -c $< -o $@
