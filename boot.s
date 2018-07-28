@@ -21,6 +21,7 @@
 
 .section .text
   start:
+    push %ebx
     mov $stack_top, %esp
     call kernel_main
     hang:

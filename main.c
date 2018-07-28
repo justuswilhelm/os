@@ -2,6 +2,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "multiboot.h"
+
 #define VGA_ADDR 0xB8000
 
 // Location of VGA buffer
@@ -23,4 +25,4 @@ void print(const char *str) {
   }
 }
 
-void kernel_main() { print("This is a test!"); }
+void kernel_main(struct multiboot *mboot_ptr) { print("This is a test!"); }
