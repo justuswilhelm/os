@@ -6,7 +6,7 @@ SRC_PATH = src
 
 OBJS = \
 	boot.o \
-	kernel.o \
+	main.o \
 
 .PHONY: toolchain
 
