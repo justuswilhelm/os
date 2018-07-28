@@ -36,7 +36,7 @@ static void check_scrollback() {
       vga_buffer[x] = vga_buffer[x + SCREEN_WIDTH];
     }
     for (size_t x = VGA_BUFFER_SIZE; x < VGA_BUFFER_SIZE + SCREEN_HEIGHT; x++) {
-      vga_buffer[x] = ' ';
+      vga_buffer[x] = SCREEN_BLANK;
     }
   }
 }
