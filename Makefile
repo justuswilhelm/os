@@ -1,4 +1,4 @@
-CC_FLAG = -std=gnu99 -ffreestanding -g -Wall -Wextra
+CFLAGS = -std=gnu99 -ffreestanding -g -Wall -Wextra
 CC = toolchain/bin/i386-elf-gcc
 AS = toolchain/bin/i386-elf-as
 
@@ -27,9 +27,6 @@ depend: .depend
 include .depend
 
 boot.o: boot.s
-	$(CC) $(CC_FLAG) -c $< -o $@
-
-%.o: %.c
 	$(CC) $(CC_FLAG) -c $< -o $@
 
 os.bin: linker.ld $(OBJS)
