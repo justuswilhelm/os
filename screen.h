@@ -9,6 +9,10 @@
 #define SCREEN_WIDTH 80
 #define VGA_BUFFER_SIZE (SCREEN_HEIGHT * SCREEN_WIDTH)
 
+#define SCREEN_BLACK 0
+#define SCREEN_WHITE 15
+#define SCREEN_BLANK (' ' | ((SCREEN_BLACK << 4) | (SCREEN_WHITE & 0x0f)))
+
 // Write a single character out to the screen.
 void screen_put(const uint8_t c);
 

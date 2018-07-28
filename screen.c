@@ -70,3 +70,12 @@ void screen_puts(const char *str) {
   }
   screen_set_cursor(screen_x, screen_y);
 }
+
+void screen_clear() {
+  for (size_t i = 0; i < VGA_BUFFER_SIZE; i++) {
+    vga_buffer[i] = SCREEN_BLANK;
+  }
+  screen_x = 0;
+  screen_y = 0;
+  screen_set_cursor(screen_x, screen_y);
+}

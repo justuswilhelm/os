@@ -4,6 +4,7 @@
 #include "screen.h"
 
 void kernel_main(struct multiboot *mboot_ptr) {
+  screen_clear();
   for (int i = 0; i < 25; i++) {
     screen_puts("This is a test!\n");
   }
