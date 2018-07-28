@@ -31,4 +31,4 @@ clean:
 	rm -f $(OBJS)
 
 format:
-	clang-format -i *.c
+	clang-format -i *.c *.h
