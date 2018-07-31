@@ -81,25 +81,8 @@ void screen_clear() {
   screen_set_cursor(screen_x, screen_y);
 }
 
-static void screen_number(const uint64_t *number_i) {
-  uint64_t number = (uint64_t)number_i;
-  char buffer[16] = {0};
-  size_t buffer_pos;
-  for (buffer_pos = 0; number > 0; buffer_pos++) {
-    buffer[buffer_pos] = (number % 10) + '0';
-    number = number / 10;
-  }
-
-  buffer_pos--;
-
-  for (size_t i = 0; i <= buffer_pos; i++) {
-    screen_put(buffer[buffer_pos - i]);
-  }
-}
-
-void screen_printf(const char *fmt, ...) {
-  va_list args;
-  va_start(args, fmt);
+static void printf(void puts(const char *), void put(const char),
+                   const char *fmt, va_list args) {
   for (size_t i = 0; fmt[i] != '\0'; i++) {
     char c = fmt[i];
     switch (c) {
@@ -109,19 +92,37 @@ void screen_printf(const char *fmt, ...) {
       switch (fmt_sign) {
       case 's': {
         char *arg = va_arg(args, char *);
-        screen_puts(arg);
+        puts(arg);
       } break;
       case 'd': {
-        uint64_t *arg = va_arg(args, uint64_t *);
-        screen_number(arg);
+        int number = (int)va_arg(args, int);
+        char buffer[16] = {0};
+        size_t buffer_pos;
+        for (buffer_pos = 0; number > 0; buffer_pos++) {
+          buffer[buffer_pos] = (number % 10) + '0';
+          number = number / 10;
+        }
+
+        buffer_pos--;
+
+        for (size_t i = 0; i <= buffer_pos; i++) {
+          put(buffer[buffer_pos - i]);
+        }
       } break;
       default:
         break;
       }
     } break;
     default:
-      screen_put(c);
+      put(c);
       break;
     }
   }
+}
+
+void screen_printf(const char *fmt, ...) {
+  va_list args;
+  va_start(args, fmt);
+  printf(screen_puts, screen_put, fmt, args);
+  va_end(args);
 }
