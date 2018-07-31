@@ -90,6 +90,28 @@ static void printf(void puts(const char *), void put(const char),
       i++;
       char fmt_sign = fmt[i];
       switch (fmt_sign) {
+      case 'x': {
+        int number = va_arg(args, int);
+        char buffer[16] = {0};
+        size_t buffer_pos;
+        for (buffer_pos = 0; number > 0; buffer_pos++) {
+          char digit = number % 16;
+          number /= 16;
+          if (digit >= 0 && digit < 10) {
+            digit = '0' + digit;
+          } else {
+            digit = 'A' + digit - 10;
+          }
+          buffer[buffer_pos] = digit;
+        }
+
+        buffer_pos--;
+        for (size_t i = 0; i <= buffer_pos; i++) {
+          put(buffer[buffer_pos - i]);
+        }
+      }
+
+      break;
       case 's': {
         char *arg = va_arg(args, char *);
         puts(arg);
