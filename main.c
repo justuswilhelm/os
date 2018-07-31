@@ -5,9 +5,9 @@
 
 void kernel_main(struct multiboot *mboot_ptr) {
   screen_clear();
-  for (int i = 0; i < 25; i++) {
+  for (int i = 0; i < 20; i++) {
     screen_puts("This is a test!\n");
   }
-  screen_puts("End---asd\n");
-  screen_puts("End---asd\n");
+  screen_printf("Hello, %s\n", "World");
+  screen_printf("The answer is %d\n", 42);
 }

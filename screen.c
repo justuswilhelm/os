@@ -1,3 +1,4 @@
+#include <stdarg.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -47,15 +48,15 @@ static void scroll() {
   screen_set_cursor(screen_x, screen_y);
 }
 
-void screen_puts(const uint8_t *str) {
+void screen_puts(const char *str) {
   for (size_t i = 0; str[i] != '\0'; i++) {
-    uint8_t c = str[i];
+    char c = str[i];
     screen_put(c);
   }
   screen_set_cursor(screen_x, screen_y);
 }
 
-void screen_put(const uint8_t c) {
+void screen_put(const char c) {
   const size_t index = screen_x + screen_y * SCREEN_WIDTH;
   switch (c) {
   case '\n':
@@ -78,4 +79,49 @@ void screen_clear() {
   screen_x = 0;
   screen_y = 0;
   screen_set_cursor(screen_x, screen_y);
+}
+
+static void screen_number(const uint64_t *number_i) {
+  uint64_t number = (uint64_t)number_i;
+  char buffer[16] = {0};
+  size_t buffer_pos;
+  for (buffer_pos = 0; number > 0; buffer_pos++) {
+    buffer[buffer_pos] = (number % 10) + '0';
+    number = number / 10;
+  }
+
+  buffer_pos--;
+
+  for (size_t i = 0; i <= buffer_pos; i++) {
+    screen_put(buffer[buffer_pos - i]);
+  }
+}
+
+void screen_printf(const char *fmt, ...) {
+  va_list args;
+  va_start(args, fmt);
+  for (size_t i = 0; fmt[i] != '\0'; i++) {
+    char c = fmt[i];
+    switch (c) {
+    case '%': {
+      i++;
+      char fmt_sign = fmt[i];
+      switch (fmt_sign) {
+      case 's': {
+        char *arg = va_arg(args, char *);
+        screen_puts(arg);
+      } break;
+      case 'd': {
+        uint64_t *arg = va_arg(args, uint64_t *);
+        screen_number(arg);
+      } break;
+      default:
+        break;
+      }
+    } break;
+    default:
+      screen_put(c);
+      break;
+    }
+  }
 }

@@ -1,6 +1,7 @@
 // http://www.jamesmolloy.co.uk/tutorial_html/3.-The%20Screen.html
 #pragma once
 
+#include <stdarg.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -14,11 +15,11 @@
 #define SCREEN_BLANK (' ' | ((SCREEN_BLACK << 4) | (SCREEN_WHITE & 0x0f)))
 
 // Write a single character out to the screen.
-void screen_put(const uint8_t c);
+void screen_put(const char c);
 
 // Clear the screen to all black.
 void screen_clear();
 
 // Output a null-terminated ASCII string to the monitor.
-void screen_puts(const uint8_t *c);
-void screen_printf(const uint8_t *c, va_list args);
+void screen_puts(const char *c);
+void screen_printf(const char *c, ...);
