@@ -1,4 +1,5 @@
 #include <stdarg.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -47,6 +48,8 @@ static void scroll() {
   }
   screen_set_cursor(screen_x, screen_y);
 }
+
+static bool isdigit(const char c) { return '0' <= c && c <= '9'; }
 
 void screen_puts(const char *str) {
   for (size_t i = 0; str[i] != '\0'; i++) {
@@ -101,7 +104,7 @@ static void print_hex(void put(const char), int number) {
   }
 }
 
-static void print_number(void put(const char), int number) {
+static void print_number(void put(const char), int number, int minimum_width) {
   char buffer[16] = {0};
   size_t buffer_pos;
   for (buffer_pos = 0; number > 0; buffer_pos++) {
@@ -111,8 +114,12 @@ static void print_number(void put(const char), int number) {
 
   buffer_pos--;
 
-  for (size_t i = 0; i <= buffer_pos; i++) {
-    put(buffer[buffer_pos - i]);
+  for (size_t padded = 0; padded < minimum_width - buffer_pos - 1; padded++) {
+    put('0');
+  }
+  size_t printed = 0;
+  for (printed = 0; printed <= buffer_pos; printed++) {
+    put(buffer[buffer_pos - printed]);
   }
 }
 
@@ -120,24 +127,49 @@ static void printf(void puts(const char *), void put(const char),
                    const char *fmt, va_list args) {
   enum state {
     NO_FORMAT,
-    FORMAT,
+    MINIMUM_WIDTH,
+    FORMAT_START,
+    FORMAT_END,
   } state = NO_FORMAT;
+  int16_t minimum_width = -1;
   for (size_t i = 0; fmt[i] != '\0'; i++) {
     char c = fmt[i];
     if (state == NO_FORMAT) {
       if (c == '%') {
-        state = FORMAT;
+        state = FORMAT_START;
       } else {
         put(c);
       }
-    } else {
+    } else if (state == MINIMUM_WIDTH) {
+      if (isdigit(c)) {
+        char d = c - '0';
+        minimum_width = (minimum_width * 10) + d;
+      } else {
+        i--;
+        state = FORMAT_END;
+      }
+    } else if (state == FORMAT_START) {
+      if (isdigit(c)) {
+        char d = c - '0';
+        if (d == 0) {
+          puts("not implemented");
+          return;
+        } else {
+          state = MINIMUM_WIDTH;
+          minimum_width = d;
+        }
+      } else {
+        i--;
+        state = FORMAT_END;
+      }
+    } else if (state == FORMAT_END) {
       if (c == 'x') {
         int number = va_arg(args, int);
         print_hex(put, number);
         state = NO_FORMAT;
       } else if (c == 'd') {
         int number = va_arg(args, int);
-        print_number(put, number);
+        print_number(put, number, minimum_width);
         state = NO_FORMAT;
       } else if (c == 's') {
         char *string = va_arg(args, char *);
