@@ -81,63 +81,73 @@ void screen_clear() {
   screen_set_cursor(screen_x, screen_y);
 }
 
+static void print_hex(void put(const char), int number) {
+  char buffer[16] = {0};
+  size_t buffer_pos;
+  for (buffer_pos = 0; number > 0; buffer_pos++) {
+    char digit = number % 16;
+    number /= 16;
+    if (digit >= 0 && digit < 10) {
+      digit = '0' + digit;
+    } else {
+      digit = 'A' + digit - 10;
+    }
+    buffer[buffer_pos] = digit;
+  }
+
+  buffer_pos--;
+  for (size_t i = 0; i <= buffer_pos; i++) {
+    put(buffer[buffer_pos - i]);
+  }
+}
+
+static void print_number(void put(const char), int number) {
+  char buffer[16] = {0};
+  size_t buffer_pos;
+  for (buffer_pos = 0; number > 0; buffer_pos++) {
+    buffer[buffer_pos] = (number % 10) + '0';
+    number = number / 10;
+  }
+
+  buffer_pos--;
+
+  for (size_t i = 0; i <= buffer_pos; i++) {
+    put(buffer[buffer_pos - i]);
+  }
+}
+
 static void printf(void puts(const char *), void put(const char),
                    const char *fmt, va_list args) {
+  enum state {
+    NO_FORMAT,
+    FORMAT,
+  } state = NO_FORMAT;
   for (size_t i = 0; fmt[i] != '\0'; i++) {
     char c = fmt[i];
-    switch (c) {
-    case '%': {
-      i++;
-      char fmt_sign = fmt[i];
-      switch (fmt_sign) {
-      case 'x': {
+    if (state == NO_FORMAT) {
+      if (c == '%') {
+        state = FORMAT;
+      } else {
+        put(c);
+      }
+    } else {
+      if (c == 'x') {
         int number = va_arg(args, int);
-        char buffer[16] = {0};
-        size_t buffer_pos;
-        for (buffer_pos = 0; number > 0; buffer_pos++) {
-          char digit = number % 16;
-          number /= 16;
-          if (digit >= 0 && digit < 10) {
-            digit = '0' + digit;
-          } else {
-            digit = 'A' + digit - 10;
-          }
-          buffer[buffer_pos] = digit;
-        }
-
-        buffer_pos--;
-        for (size_t i = 0; i <= buffer_pos; i++) {
-          put(buffer[buffer_pos - i]);
-        }
+        print_hex(put, number);
+        state = NO_FORMAT;
+      } else if (c == 'd') {
+        int number = va_arg(args, int);
+        print_number(put, number);
+        state = NO_FORMAT;
+      } else if (c == 's') {
+        char *string = va_arg(args, char *);
+        puts(string);
+        state = NO_FORMAT;
+      } else {
+        puts("Expected format specification");
+        state = NO_FORMAT;
+        continue;
       }
-
-      break;
-      case 's': {
-        char *arg = va_arg(args, char *);
-        puts(arg);
-      } break;
-      case 'd': {
-        int number = (int)va_arg(args, int);
-        char buffer[16] = {0};
-        size_t buffer_pos;
-        for (buffer_pos = 0; number > 0; buffer_pos++) {
-          buffer[buffer_pos] = (number % 10) + '0';
-          number = number / 10;
-        }
-
-        buffer_pos--;
-
-        for (size_t i = 0; i <= buffer_pos; i++) {
-          put(buffer[buffer_pos - i]);
-        }
-      } break;
-      default:
-        break;
-      }
-    } break;
-    default:
-      put(c);
-      break;
     }
   }
 }
