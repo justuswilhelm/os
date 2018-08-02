@@ -14,7 +14,7 @@ static size_t screen_x = 0;
 static size_t screen_y = 0;
 
 // http://www.jamesmolloy.co.uk/tutorial_html/3.-The%20Screen.html
-static void screen_set_cursor(size_t x, size_t y) {
+static void set_cursor(size_t x, size_t y) {
   // The screen is 80 characters wide...
   size_t location = y * SCREEN_WIDTH + x;
   // Tell the VGA board we are setting the high cursor byte.
@@ -27,37 +27,24 @@ static void screen_set_cursor(size_t x, size_t y) {
   outb(0x3D5, location);
 }
 
-static void scrollback() {
-  for (size_t x = 0; x < VGA_BUFFER_SIZE; x++) {
-    vga_buffer[x] = vga_buffer[x + SCREEN_WIDTH];
-  }
-  for (size_t x = VGA_BUFFER_SIZE; x < VGA_BUFFER_SIZE + SCREEN_HEIGHT; x++) {
-    vga_buffer[x] = SCREEN_BLANK;
-  }
-}
-
 static void scroll() {
   screen_x = 0;
   if (screen_y >= SCREEN_HEIGHT) {
-    scrollback();
+    for (size_t x = 0; x < VGA_BUFFER_SIZE; x++) {
+      vga_buffer[x] = vga_buffer[x + SCREEN_WIDTH];
+    }
+    for (size_t x = VGA_BUFFER_SIZE; x < VGA_BUFFER_SIZE + SCREEN_HEIGHT; x++) {
+      vga_buffer[x] = SCREEN_BLANK;
+    }
     screen_y--;
   } else {
     screen_y++;
   }
-  screen_set_cursor(screen_x, screen_y);
 }
 
 static bool isdigit(const char c) { return '0' <= c && c <= '9'; }
 
-void screen_puts(const char *str) {
-  for (size_t i = 0; str[i] != '\0'; i++) {
-    char c = str[i];
-    screen_put(c);
-  }
-  screen_set_cursor(screen_x, screen_y);
-}
-
-void screen_put(const char c) {
+static void screen_put(const char c) {
   const size_t index = screen_x + screen_y * SCREEN_WIDTH;
   switch (c) {
   case '\n':
@@ -73,13 +60,21 @@ void screen_put(const char c) {
   }
 }
 
+void screen_puts(const char *str) {
+  for (size_t i = 0; str[i] != '\0'; i++) {
+    char c = str[i];
+    screen_put(c);
+  }
+  set_cursor(screen_x, screen_y);
+}
+
 void screen_clear() {
   for (size_t i = 0; i < VGA_BUFFER_SIZE; i++) {
     vga_buffer[i] = SCREEN_BLANK;
   }
   screen_x = 0;
   screen_y = 0;
-  screen_set_cursor(screen_x, screen_y);
+  set_cursor(screen_x, screen_y);
 }
 
 struct print_ctx {

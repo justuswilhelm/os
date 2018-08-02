@@ -14,9 +14,6 @@
 #define SCREEN_WHITE 15
 #define SCREEN_BLANK (' ' | ((SCREEN_BLACK << 4) | (SCREEN_WHITE & 0x0f)))
 
-// Write a single character out to the screen.
-void screen_put(const char c);
-
 // Clear the screen to all black.
 void screen_clear();
 
