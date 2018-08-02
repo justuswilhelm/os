@@ -5,8 +5,8 @@ AS = toolchain/bin/i386-elf-as
 SRC_PATH = src
 
 SRCS = \
+	cpu.c \
 	main.c \
-	ports.c \
 	screen.c \
 
 OBJS = \

@@ -3,7 +3,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include "ports.h"
+#include "cpu.h"
 #include "screen.h"
 
 // Location of VGA buffer
