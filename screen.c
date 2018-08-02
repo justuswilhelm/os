@@ -27,21 +27,19 @@ static void screen_set_cursor(size_t x, size_t y) {
   outb(0x3D5, location);
 }
 
-static void check_scrollback() {
-  if ((screen_y) >= (SCREEN_HEIGHT)) {
-    for (size_t x = 0; x < VGA_BUFFER_SIZE; x++) {
-      vga_buffer[x] = vga_buffer[x + SCREEN_WIDTH];
-    }
-    for (size_t x = VGA_BUFFER_SIZE; x < VGA_BUFFER_SIZE + SCREEN_HEIGHT; x++) {
-      vga_buffer[x] = SCREEN_BLANK;
-    }
+static void scrollback() {
+  for (size_t x = 0; x < VGA_BUFFER_SIZE; x++) {
+    vga_buffer[x] = vga_buffer[x + SCREEN_WIDTH];
+  }
+  for (size_t x = VGA_BUFFER_SIZE; x < VGA_BUFFER_SIZE + SCREEN_HEIGHT; x++) {
+    vga_buffer[x] = SCREEN_BLANK;
   }
 }
 
 static void scroll() {
   screen_x = 0;
   if (screen_y >= SCREEN_HEIGHT) {
-    check_scrollback();
+    scrollback();
     screen_y--;
   } else {
     screen_y++;
