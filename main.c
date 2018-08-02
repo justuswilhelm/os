@@ -10,6 +10,6 @@ void kernel_main(struct multiboot *mboot_ptr) {
   }
   screen_printf("Hello, %s\n", "World");
   screen_printf("The answer is %4d\n", 42);
-  screen_printf("And in hexadecimal, 255 + 1 : %x + %x = %x\n", 255, 1,
+  screen_printf("And in hexadecimal, 255 + 1 : %02x + %02x = %04x\n", 255, 1,
                 255 + 1);
 }

@@ -84,7 +84,30 @@ void screen_clear() {
   screen_set_cursor(screen_x, screen_y);
 }
 
-static void print_hex(void put(const char), int number) {
+struct print_ctx {
+  bool has_minimum_width;
+  int minimum_width;
+  enum { ZERO, SPACE } padding;
+};
+
+static void print_padding(void put(const char), size_t length,
+                          struct print_ctx *ctx) {
+  if (ctx->has_minimum_width) {
+    for (size_t padded = 0; padded < ctx->minimum_width - length - 1;
+         padded++) {
+      switch (ctx->padding) {
+      case ZERO:
+        put('0');
+        break;
+      case SPACE:
+        put(' ');
+        break;
+      }
+    }
+  }
+}
+
+static void print_hex(void put(const char), int number, struct print_ctx *ctx) {
   char buffer[16] = {0};
   size_t buffer_pos;
   for (buffer_pos = 0; number > 0; buffer_pos++) {
@@ -99,12 +122,16 @@ static void print_hex(void put(const char), int number) {
   }
 
   buffer_pos--;
+
+  print_padding(put, buffer_pos, ctx);
+
   for (size_t i = 0; i <= buffer_pos; i++) {
     put(buffer[buffer_pos - i]);
   }
 }
 
-static void print_number(void put(const char), int number, int minimum_width) {
+static void print_number(void put(const char), int number,
+                         struct print_ctx *ctx) {
   char buffer[16] = {0};
   size_t buffer_pos;
   for (buffer_pos = 0; number > 0; buffer_pos++) {
@@ -114,11 +141,9 @@ static void print_number(void put(const char), int number, int minimum_width) {
 
   buffer_pos--;
 
-  for (size_t padded = 0; padded < minimum_width - buffer_pos - 1; padded++) {
-    put('0');
-  }
-  size_t printed = 0;
-  for (printed = 0; printed <= buffer_pos; printed++) {
+  print_padding(put, buffer_pos, ctx);
+
+  for (size_t printed = 0; printed <= buffer_pos; printed++) {
     put(buffer[buffer_pos - printed]);
   }
 }
@@ -131,7 +156,10 @@ static void printf(void puts(const char *), void put(const char),
     FORMAT_START,
     FORMAT_END,
   } state = NO_FORMAT;
-  int16_t minimum_width = -1;
+  struct print_ctx ctx = {
+      .minimum_width = -1,
+      .padding = SPACE,
+  };
   for (size_t i = 0; fmt[i] != '\0'; i++) {
     char c = fmt[i];
     if (state == NO_FORMAT) {
@@ -143,7 +171,7 @@ static void printf(void puts(const char *), void put(const char),
     } else if (state == MINIMUM_WIDTH) {
       if (isdigit(c)) {
         char d = c - '0';
-        minimum_width = (minimum_width * 10) + d;
+        ctx.minimum_width = (ctx.minimum_width * 10) + d;
       } else {
         i--;
         state = FORMAT_END;
@@ -152,11 +180,13 @@ static void printf(void puts(const char *), void put(const char),
       if (isdigit(c)) {
         char d = c - '0';
         if (d == 0) {
-          puts("not implemented");
-          return;
+          ctx.padding = ZERO;
+          // puts("not implemented");
+          // return;
         } else {
           state = MINIMUM_WIDTH;
-          minimum_width = d;
+          ctx.has_minimum_width = true;
+          ctx.minimum_width = d;
         }
       } else {
         i--;
@@ -165,11 +195,11 @@ static void printf(void puts(const char *), void put(const char),
     } else if (state == FORMAT_END) {
       if (c == 'x') {
         int number = va_arg(args, int);
-        print_hex(put, number);
+        print_hex(put, number, &ctx);
         state = NO_FORMAT;
       } else if (c == 'd') {
         int number = va_arg(args, int);
-        print_number(put, number, minimum_width);
+        print_number(put, number, &ctx);
         state = NO_FORMAT;
       } else if (c == 's') {
         char *string = va_arg(args, char *);
