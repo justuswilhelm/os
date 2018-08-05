@@ -6,21 +6,25 @@ SRC_PATH = src
 
 AS_SRCS = \
 	boot.s \
+	gdt_s.s \
+	idt_s.s \
 
 C_SRCS = \
 	cpu.c \
 	gdt.c \
-	gdt.s \
+	idt.c \
+	isr.c \
 	main.c \
 	screen.c \
 
 OBJS = \
-	$(patsubst %.s,%.o,$(AS_SRCS)) \
 	$(patsubst %.c,%.o,$(C_SRCS)) \
+	$(patsubst %.s,%.o,$(AS_SRCS)) \
 
 .PHONY: toolchain depend
 
 all: os.bin
+	echo $(OBJS)
 
 qemu: os.bin
 	qemu-system-i386 -kernel $<
