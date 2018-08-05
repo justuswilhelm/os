@@ -3,7 +3,8 @@
 #include "multiboot.h"
 #include "screen.h"
 
-void kernel_main(struct multiboot *mboot_ptr) {
+// void kernel_main(struct multiboot *mboot_ptr) {
+void kernel_main() {
   screen_clear();
   for (int i = 0; i < 20; i++) {
     screen_puts("This is a test!\n");
