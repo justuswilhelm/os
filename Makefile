@@ -9,6 +9,8 @@ AS_SRCS = \
 
 C_SRCS = \
 	cpu.c \
+	gdt.c \
+	gdt.s \
 	main.c \
 	screen.c \
 

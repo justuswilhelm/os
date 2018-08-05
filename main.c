@@ -1,10 +1,12 @@
 /* Inspired by https://wiki.osdev.org/User:Zesterer/Bare_Bones#kernel.c */
 
+#include "gdt.h"
 #include "multiboot.h"
 #include "screen.h"
 
 // void kernel_main(struct multiboot *mboot_ptr) {
 void kernel_main() {
+  init_gdt();
   screen_clear();
   for (int i = 0; i < 20; i++) {
     screen_puts("This is a test!\n");
