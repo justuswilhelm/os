@@ -1,0 +1,26 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: gcc:8
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+          - v1-dependencies-{{ checksum "toolchain/Makefile" }}
+
+      - run:
+          name: Create cross-compilation toolchain
+          command: |
+            make toolchain
+
+      - save_cache:
+          paths:
+            - ./venv
+          key: v1-dependencies-{{ checksum "toolchain/Makefile" }}
+
+      - run:
+          name: Build all
+          command: |
+            make
