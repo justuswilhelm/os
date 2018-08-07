@@ -1,6 +1,3 @@
-export CC=gcc-8
-export CXX=g++-8
-export LD=gcc-8
 export PREFIX=$(CURDIR)
 export TARGET=i386-elf
 
