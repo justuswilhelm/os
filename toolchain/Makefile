@@ -1,6 +1,9 @@
 export PREFIX=$(CURDIR)
 export TARGET=i386-elf
 
+TAR = tar
+TAR_FLAG = xzf
+
 BINUTILS_VER = 2.31.1
 BINUTILS_PATH = binutils-$(BINUTILS_VER)
 BINUTILS_BUILD_PATH = $(BINUTILS_PATH)-build
@@ -32,7 +35,7 @@ $(BINUTILS_BUILD_PATH)/Makefile: $(BINUTILS_PATH)/configure
 			--with-sysroot
 
 $(BINUTILS_PATH)/configure: $(BINUTILS_AR)
-	tar xvzf $<
+	$(TAR) $(TAR_FLAG) $<
 	touch $@
 
 $(BINUTILS_AR):
@@ -58,7 +61,7 @@ $(GCC_BUILD_PATH)/Makefile: $(GCC_PATH)/configure
 			--without-headers
 
 $(GCC_PATH)/configure: $(GCC_AR)
-	tar xvzf $<
+	$(TAR) $(TAR_FLAG) $<
 	touch $@
 
 $(GCC_AR):
