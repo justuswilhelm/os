@@ -59,8 +59,6 @@ isr_noerrcode 29
 isr_noerrcode 30
 isr_noerrcode 31
 
-.extern isr_handler
-
 // This is our common ISR stub. It saves the processor state, sets
 // up for kernel mode segments, calls the C-level fault handler,
 // and finally restores the stack frame.

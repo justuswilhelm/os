@@ -28,8 +28,6 @@ irq 13, 45
 irq 14, 46
 irq 15, 47
 
-.extern irq_handler
-
 // This is our common IRQ stub. It saves the processor state, sets
 // up for kernel mode segments, calls the C-level fault handler,
 // and finally restores the stack frame.
