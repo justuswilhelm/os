@@ -27,7 +27,6 @@ OBJS = \
 .PHONY: toolchain depend
 
 all: os.bin
-	echo $(OBJS)
 
 qemu: os.bin
 	qemu-system-i386 -kernel $<
