@@ -8,11 +8,13 @@ AS_SRCS = \
 	boot.s \
 	gdt_s.s \
 	idt_s.s \
+	irq_s.s \
 
 C_SRCS = \
 	cpu.c \
 	gdt.c \
 	idt.c \
+	irq.c \
 	isr.c \
 	main.c \
 	screen.c \
