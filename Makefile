@@ -18,6 +18,7 @@ C_SRCS = \
 	isr.c \
 	main.c \
 	screen.c \
+	timer.c \
 
 OBJS = \
 	$(patsubst %.c,%.o,$(C_SRCS)) \

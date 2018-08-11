@@ -4,6 +4,7 @@
 #include "idt.h"
 #include "multiboot.h"
 #include "screen.h"
+#include "timer.h"
 
 // void kernel_main(struct multiboot *mboot_ptr) {
 void kernel_main() {
@@ -19,4 +20,6 @@ void kernel_main() {
                 255 + 1);
   asm volatile("int $0x3");
   asm volatile("int $0x4");
+
+  init_timer(1);
 }
