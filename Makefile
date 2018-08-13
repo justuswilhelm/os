@@ -16,6 +16,7 @@ C_SRCS = \
 	idt.c \
 	irq.c \
 	isr.c \
+	keyboard.c \
 	main.c \
 	screen.c \
 	timer.c \

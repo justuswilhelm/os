@@ -2,6 +2,7 @@
 
 #include "gdt.h"
 #include "idt.h"
+#include "keyboard.h"
 #include "multiboot.h"
 #include "screen.h"
 #include "timer.h"
@@ -16,7 +17,8 @@ void kernel_main() {
   screen_printf("And in hexadecimal, 255 + 1 : %02x + %02x = %04x\n", 255, 1,
                 255 + 1);
 
-  init_timer(1);
+  // init_timer(1);
+  init_keyboard();
   for (;;) {
     asm volatile("hlt");
   }
