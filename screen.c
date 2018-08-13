@@ -60,6 +60,7 @@ static void screen_put(const char c) {
     }
     break;
   }
+  set_cursor(screen_x, screen_y);
 }
 
 void screen_puts(const char *str) {
@@ -67,7 +68,6 @@ void screen_puts(const char *str) {
     char c = str[i];
     screen_put(c);
   }
-  set_cursor(screen_x, screen_y);
 }
 
 void screen_clear() {
