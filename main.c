@@ -22,4 +22,7 @@ void kernel_main() {
   asm volatile("int $0x4");
 
   init_timer(1);
+  for (;;) {
+    asm volatile("hlt");
+  }
 }
