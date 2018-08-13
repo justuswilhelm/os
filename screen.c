@@ -87,32 +87,39 @@ struct print_ctx {
 
 static void print_padding(void put(const char), size_t length,
                           struct print_ctx *ctx) {
-  if (ctx->has_minimum_width > 0) {
-    for (size_t padded = 0; padded < ctx->minimum_width - length - 1;
-         padded++) {
-      switch (ctx->padding) {
-      case ZERO:
-        put('0');
-        break;
-      case SPACE:
-        put(' ');
-        break;
-      default:
-        put('X');
-        return;
-      }
+  if (!ctx->has_minimum_width) {
+    return;
+  }
+  if (length > ctx->has_minimum_width) {
+    return;
+  }
+  size_t padding = ctx->minimum_width - length - 1;
+  for (size_t padded = 0; padded < padding; padded++) {
+    switch (ctx->padding) {
+    case ZERO:
+      put('0');
+      break;
+    case SPACE:
+      put(' ');
+      break;
+    default:
+      put('X');
+      return;
     }
   }
 }
 
 static void print_hex(void put(const char), int number, struct print_ctx *ctx) {
-  char buffer[16] = {0};
+  char buffer[CONVERSION_BUFFER_SIZE] = {0};
   size_t buffer_pos = 0;
   if (number == 0) {
     buffer[0] = 'A';
     buffer_pos++;
   } else {
     for (; number > 0; buffer_pos++) {
+      if (buffer_pos >= CONVERSION_BUFFER_SIZE) {
+        return;
+      }
       char digit = number % 16;
       number /= 16;
       if (digit >= 0 && digit < 10) {
@@ -142,6 +149,9 @@ static void print_number(void put(const char), int number,
     buffer[0] = '0';
   } else {
     for (; number > 0; buffer_pos++) {
+      if (buffer_pos >= CONVERSION_BUFFER_SIZE) {
+        return;
+      }
       buffer[buffer_pos] = (number % 10) + '0';
       number = number / 10;
     }
