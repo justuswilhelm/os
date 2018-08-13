@@ -11,26 +11,12 @@ void idt_flush(uint32_t);
 void init_idt();
 static void idt_set_gate(uint8_t, uint32_t, uint16_t, uint8_t);
 
-struct idt_entry idt_entries[256];
 struct idt_ptr idt_ptr;
-
-static void *memset(void *dest, int ch, size_t count) {
-  unsigned char *dest_cp = dest;
-
-  while (count > 0) {
-    *dest_cp = (unsigned char)ch;
-    dest_cp++;
-    count--;
-  }
-
-  return dest;
-}
+struct idt_entry idt_entries[256] = {{0, 0, 0, 0, 0}};
 
 void init_idt() {
   idt_ptr.limit = sizeof(struct idt_entry) * 256 - 1;
   idt_ptr.base = (uint32_t)&idt_entries;
-
-  memset(&idt_entries, 0, sizeof(struct idt_entry) * 256);
 
   // Remap the IRQ table
   outb(0x20, 0x11);

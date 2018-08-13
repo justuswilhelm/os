@@ -8,7 +8,7 @@
 #include "isr.h"
 #include "screen.h"
 
-isr_t interrupt_handlers[256];
+isr_t interrupt_handlers[256] = {0};
 
 void register_interrupt_handler(uint8_t n, isr_t handler) {
   interrupt_handlers[n] = handler;
