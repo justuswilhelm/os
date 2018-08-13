@@ -25,8 +25,7 @@ start:
   push %ebx
   mov $stack_top, %esp
   call kernel_main
-
-hang:
   cli
+hang:
   hlt
   jmp hang
