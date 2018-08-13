@@ -29,6 +29,7 @@ void init_idt() {
   outb(0xA1, 0x01);
   outb(0x21, 0x0);
   outb(0xA1, 0x0);
+  asm volatile("sti");
 
   idt_set_gate(0, (uint32_t)isr0, 0x08, 0x8E);
   idt_set_gate(1, (uint32_t)isr1, 0x08, 0x8E);
