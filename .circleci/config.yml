@@ -20,7 +20,7 @@ jobs:
       - save_cache:
           paths:
             - ./toolchain
-          key: v1-toolchain-checksum "toolchain/Makefile" }}
+          key: v1-toolchain-{{ checksum "toolchain/Makefile" }}
       - run:
           name: Build all
           command: |

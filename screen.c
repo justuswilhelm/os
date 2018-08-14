@@ -6,6 +6,8 @@
 #include "cpu.h"
 #include "screen.h"
 
+#define CONVERSION_BUFFER_SIZE 32
+
 // Location of VGA buffer
 static volatile uint16_t *vga_buffer = (uint16_t *)VGA_ADDR;
 
@@ -58,6 +60,7 @@ static void screen_put(const char c) {
     }
     break;
   }
+  set_cursor(screen_x, screen_y);
 }
 
 void screen_puts(const char *str) {
@@ -65,7 +68,6 @@ void screen_puts(const char *str) {
     char c = str[i];
     screen_put(c);
   }
-  set_cursor(screen_x, screen_y);
 }
 
 void screen_clear() {
@@ -85,33 +87,48 @@ struct print_ctx {
 
 static void print_padding(void put(const char), size_t length,
                           struct print_ctx *ctx) {
-  if (ctx->has_minimum_width) {
-    for (size_t padded = 0; padded < ctx->minimum_width - length - 1;
-         padded++) {
-      switch (ctx->padding) {
-      case ZERO:
-        put('0');
-        break;
-      case SPACE:
-        put(' ');
-        break;
-      }
+  if (!ctx->has_minimum_width) {
+    return;
+  }
+  if (length > ctx->has_minimum_width) {
+    return;
+  }
+  size_t padding = ctx->minimum_width - length - 1;
+  for (size_t padded = 0; padded < padding; padded++) {
+    switch (ctx->padding) {
+    case ZERO:
+      put('0');
+      break;
+    case SPACE:
+      put(' ');
+      break;
+    default:
+      put('X');
+      return;
     }
   }
 }
 
 static void print_hex(void put(const char), int number, struct print_ctx *ctx) {
-  char buffer[16] = {0};
-  size_t buffer_pos;
-  for (buffer_pos = 0; number > 0; buffer_pos++) {
-    char digit = number % 16;
-    number /= 16;
-    if (digit >= 0 && digit < 10) {
-      digit = '0' + digit;
-    } else {
-      digit = 'A' + digit - 10;
+  char buffer[CONVERSION_BUFFER_SIZE] = {0};
+  size_t buffer_pos = 0;
+  if (number == 0) {
+    buffer[0] = 'A';
+    buffer_pos++;
+  } else {
+    for (; number > 0; buffer_pos++) {
+      if (buffer_pos >= CONVERSION_BUFFER_SIZE) {
+        return;
+      }
+      char digit = number % 16;
+      number /= 16;
+      if (digit >= 0 && digit < 10) {
+        digit = '0' + digit;
+      } else {
+        digit = 'A' + digit - 10;
+      }
+      buffer[buffer_pos] = digit;
     }
-    buffer[buffer_pos] = digit;
   }
 
   buffer_pos--;
@@ -125,11 +142,19 @@ static void print_hex(void put(const char), int number, struct print_ctx *ctx) {
 
 static void print_number(void put(const char), int number,
                          struct print_ctx *ctx) {
-  char buffer[16] = {0};
-  size_t buffer_pos;
-  for (buffer_pos = 0; number > 0; buffer_pos++) {
-    buffer[buffer_pos] = (number % 10) + '0';
-    number = number / 10;
+  char buffer[CONVERSION_BUFFER_SIZE] = {0};
+  size_t buffer_pos = 0;
+  if (number == 0) {
+    buffer_pos++;
+    buffer[0] = '0';
+  } else {
+    for (; number > 0; buffer_pos++) {
+      if (buffer_pos >= CONVERSION_BUFFER_SIZE) {
+        return;
+      }
+      buffer[buffer_pos] = (number % 10) + '0';
+      number = number / 10;
+    }
   }
 
   buffer_pos--;
@@ -203,6 +228,9 @@ static void printf(void puts(const char *), void put(const char),
         state = NO_FORMAT;
         continue;
       }
+    } else {
+      puts("Something went wrong");
+      return;
     }
   }
 }

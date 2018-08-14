@@ -8,14 +8,18 @@ AS_SRCS = \
 	boot.s \
 	gdt_s.s \
 	idt_s.s \
+	irq_s.s \
 
 C_SRCS = \
 	cpu.c \
 	gdt.c \
 	idt.c \
+	irq.c \
 	isr.c \
+	keyboard.c \
 	main.c \
 	screen.c \
+	timer.c \
 
 OBJS = \
 	$(patsubst %.c,%.o,$(C_SRCS)) \
@@ -24,7 +28,6 @@ OBJS = \
 .PHONY: toolchain depend
 
 all: os.bin
-	echo $(OBJS)
 
 qemu: os.bin
 	qemu-system-i386 -kernel $<

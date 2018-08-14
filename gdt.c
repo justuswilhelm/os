@@ -2,7 +2,7 @@
 // http://www.jamesmolloy.co.uk/tutorial_html/4.-The%20GDT%20and%20IDT.html
 #include "gdt.h"
 
-extern void gdt_flush(uint32_t);
+void gdt_flush(uint32_t);
 static void gdt_set_gate(int32_t, uint32_t, uint32_t, uint8_t, uint8_t);
 
 struct gdt_entry gdt_entries[5];

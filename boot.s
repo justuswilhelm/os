@@ -1,6 +1,4 @@
 /* Taken from https://wiki.osdev.org/User:Zesterer/Bare_Bones#start.s */
-.extern kernel_main
-
 .global start
 
 .set MB_MAGIC, 0x1BADB002
@@ -27,8 +25,7 @@ start:
   push %ebx
   mov $stack_top, %esp
   call kernel_main
-
-hang:
   cli
+hang:
   hlt
   jmp hang

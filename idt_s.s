@@ -9,57 +9,55 @@ idt_flush:
   lidt (%eax)
   ret
 
-.macro isr_noerrcode name value
-  .global isr\name
-  isr\name:
+.macro isr_noerrcode value
+  .global isr\value
+  isr\value:
     cli
     pushl $0
-    pushl \value
+    pushl $\value
     jmp isr_common_stub
 .endm
 
-.macro isr_errcode name value
-  .global isr\name
-  isr\name:
+.macro isr_errcode value
+  .global isr\value
+  isr\value:
     cli
-    pushl \value
+    pushl $\value
     jmp isr_common_stub
 .endm
 
-isr_noerrcode 0 $0
-isr_noerrcode 1, $1
-isr_noerrcode 2, $2
-isr_noerrcode 3, $3
-isr_noerrcode 4, $4
-isr_noerrcode 5, $5
-isr_noerrcode 6, $6
-isr_noerrcode 7, $7
-isr_errcode 8, $8
-isr_noerrcode 9, $9
-isr_errcode 10, $10
-isr_errcode 11, $11
-isr_errcode 12, $12
-isr_errcode 13, $13
-isr_errcode 14, $14
-isr_noerrcode 15, $15
-isr_noerrcode 16, $16
-isr_noerrcode 17, $17
-isr_noerrcode 18, $18
-isr_noerrcode 19, $19
-isr_noerrcode 20, $20
-isr_noerrcode 21, $21
-isr_noerrcode 22, $22
-isr_noerrcode 23, $23
-isr_noerrcode 24, $24
-isr_noerrcode 25, $25
-isr_noerrcode 26, $26
-isr_noerrcode 27, $27
-isr_noerrcode 28, $28
-isr_noerrcode 29, $29
-isr_noerrcode 30, $30
-isr_noerrcode 31, $31
-
-.extern isr_handler
+isr_noerrcode 0
+isr_noerrcode 1
+isr_noerrcode 2
+isr_noerrcode 3
+isr_noerrcode 4
+isr_noerrcode 5
+isr_noerrcode 6
+isr_noerrcode 7
+isr_errcode 8
+isr_noerrcode 9
+isr_errcode 10
+isr_errcode 11
+isr_errcode 12
+isr_errcode 13
+isr_errcode 14
+isr_noerrcode 15
+isr_noerrcode 16
+isr_noerrcode 17
+isr_noerrcode 18
+isr_noerrcode 19
+isr_noerrcode 20
+isr_noerrcode 21
+isr_noerrcode 22
+isr_noerrcode 23
+isr_noerrcode 24
+isr_noerrcode 25
+isr_noerrcode 26
+isr_noerrcode 27
+isr_noerrcode 28
+isr_noerrcode 29
+isr_noerrcode 30
+isr_noerrcode 31
 
 // This is our common ISR stub. It saves the processor state, sets
 // up for kernel mode segments, calls the C-level fault handler,
