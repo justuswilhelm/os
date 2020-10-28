@@ -42,8 +42,8 @@ debug: os.bin
 depend: .depend
 
 .depend: $(C_SRCS)
-	rm -f ./.depend
-	$(CC) $(CFLAGS) -MM $^ -MF  ./.depend
+	rm -f $@
+	$(CC) $(CFLAGS) -MM $^ -MF $@
 
 include .depend
 
