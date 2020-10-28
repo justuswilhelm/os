@@ -1,6 +1,7 @@
 CFLAGS = -std=gnu99 -ffreestanding -g -Wall -Wextra -Werror
 CC = toolchain/bin/i386-elf-gcc
 AS = toolchain/bin/i386-elf-as
+GDB = toolchain/bin/i386-elf-gdb
 
 SRC_PATH = src
 
@@ -31,6 +32,12 @@ all: os.bin
 
 qemu: os.bin
 	qemu-system-i386 -kernel $<
+
+qemu-debug: os.bin
+	qemu-system-i386 -kernel $< -s -S -d int -no-reboot -no-shutdown
+
+debug: os.bin
+	$(GDB) -d int
 
 depend: .depend
 

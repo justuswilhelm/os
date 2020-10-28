@@ -2,13 +2,13 @@
 *.bin
 *.o
 *.tar.gz
+.gdb_history
 toolchain/bin/
 toolchain/binutils-*/
 toolchain/gcc-*/
-toolchain/i386-elf
+toolchain/gdb-*/
+toolchain/i386-elf/
+toolchain/include/
 toolchain/lib/
 toolchain/libexec/
 toolchain/share/
-toolchain/etc/
-toolchain/grub-*/
-toolchain/sbin/
