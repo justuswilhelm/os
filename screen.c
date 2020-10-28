@@ -127,7 +127,7 @@ static void print_hex(void put(const char), int number, struct print_ctx *ctx) {
     number = -number;
   }
   if (number == 0) {
-    buffer[0] = 'A';
+    buffer[0] = '0';
     buffer_pos++;
   } else {
     for (; number > 0; buffer_pos++) {
