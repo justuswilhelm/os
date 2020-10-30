@@ -38,8 +38,6 @@ void irq15();
 #define IRQ14 46
 #define IRQ15 47
 
-// Enables registration of callbacks for interrupts or IRQs.
 // For IRQs, to ease confusion, use the #defines above as the
 // first parameter.
-typedef void (*isr_t)(struct registers);
 void register_interrupt_handler(uint8_t n, isr_t handler);
