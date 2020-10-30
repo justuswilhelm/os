@@ -31,3 +31,10 @@ sudo apt install libgmp-dev libmpfr-dev libmpc-dev zlib1g-dev
 ```
 make toolchain -j 16
 ```
+
+## Object dump
+
+```
+make
+objdump --disassemble --print-imm-hex os.bin | less
+```
