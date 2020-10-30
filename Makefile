@@ -20,7 +20,9 @@ C_SRCS = \
 	keyboard.c \
 	kheap.c \
 	main.c \
+	paging.c \
 	screen.c \
+	string.c \
 	timer.c \
 
 OBJS = \

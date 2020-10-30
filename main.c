@@ -4,6 +4,7 @@
 #include "idt.h"
 #include "keyboard.h"
 #include "multiboot.h"
+#include "paging.h"
 #include "screen.h"
 #include "timer.h"
 
@@ -19,8 +20,11 @@ void test_print() {
 void kernel_main() {
   init_gdt();
   init_idt();
+  init_paging();
   screen_clear();
   test_print();
+
+  screen_printf("The value is %x", *(uint32_t *)0xA0000000);
 
   // init_timer(1);
   init_keyboard();

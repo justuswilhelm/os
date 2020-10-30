@@ -20,3 +20,11 @@ void screen_clear();
 // Output a null-terminated ASCII string to the monitor.
 void screen_puts(const char *c);
 void screen_printf(const char *c, ...);
+
+#define PANIC(message)                                                         \
+  {                                                                            \
+    screen_printf("Panic at %s:%d: %s", __FILE__, __LINE__, #message);         \
+    for (;;) {                                                                 \
+      asm volatile("hlt");                                                     \
+    }                                                                          \
+  }
