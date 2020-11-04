@@ -12,6 +12,7 @@ AS_SRCS = \
 	irq_s.s \
 
 C_SRCS = \
+	bitset.c \
 	cpu.c \
 	gdt.c \
 	idt.c \
