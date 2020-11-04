@@ -3,40 +3,67 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include "bitset.h"
 #include "irq.h"
 #include "kheap.h"
 #include "paging.h"
 #include "screen.h"
 #include "string.h"
 
+struct page_table *boot_table = NULL;
 struct page_directory *kernel_directory = NULL;
 struct page_directory *current_directory = NULL;
 
-static uint32_t table_to_pde(struct page_table *table) {
+// How many pages do we want to make available?
+// Static for now
+// 4 * 4 MiB
+// This will result in 128 bytes being allocated
+uint32_t pages_bitset_bits[BITSET_SIZE(1024 * 4)] = {0};
+struct bitset pages_bitset = {.values = pages_bitset_bits, .size = 1024 * 4};
+
+static uint32_t page_table_ptr_to_pde(void *table) {
   return (((uint32_t)table) & 0xfffff000) | 0x7;
 }
 
-struct page *get_page(uintptr_t address, bool make_table,
-                      struct page_directory *dir) {
+// Return memory address of new page
+static void *allocate_page() {
+  struct bitset_find_free_result result = bitset_find_free(&pages_bitset);
+  if (!result.success) {
+    PANIC("No pages available");
+  }
+  bitset_set(&pages_bitset, result.index);
+  return (void *)(result.index * 4096);
+}
+
+static struct page_table *allocate_page_table(uint32_t table_idx,
+                                              struct page_directory *dir) {
+  // Allocate table entry in virtual memory
+  struct page_table *table = kmalloc_a(sizeof(struct page_table));
+  memset(table, 0, sizeof(struct page_table));
+  // Update physical pointer with identity mapped adddress
+  dir->tables_physical[table_idx] = page_table_ptr_to_pde(table);
+  // This is in virtual memory anyway
+  dir->tables[table_idx] = table;
+  return table;
+}
+
+struct page *get_page(uintptr_t address, struct page_directory *dir) {
   // Turn the address into an index. Identifies the table in directory.
   address /= 0x1000;
   // Find the page table containing this address.
-  uintptr_t table_idx = address / 1024;
-  uintptr_t idx = address % 1024;
+  uint32_t table_idx = address / 1024;
+  uint32_t idx = address % 1024;
   // if caller wishes, ensure that table exists
-  if (make_table && !dir->tables[table_idx]) {
+  if (!dir->tables[table_idx]) {
     // allocate table if it does not exist
-    struct page_table *table = kmalloc_a(sizeof(struct page_table));
-    memset(table, 0, sizeof(struct page_table));
-    dir->tables[table_idx] = table;
-    dir->tables_physical[table_idx] = table_to_pde(dir->tables[table_idx]);
+    allocate_page_table(table_idx, dir);
   }
   return &dir->tables[table_idx]->pages[idx];
 }
 
-void write_page(struct page *page, bool is_kernel, bool is_writeable,
-                uintptr_t frame) {
-  if (page->frame != 0) {
+void write_page(struct page *page, bool is_kernel, bool is_writeable) {
+  uintptr_t frame = (uintptr_t)allocate_page();
+  if (page->present) {
     return; // Frame was already allocated, return straight away.
   } else {
     page->present = 1;                 // Mark it as present.
@@ -46,6 +73,10 @@ void write_page(struct page *page, bool is_kernel, bool is_writeable,
   }
 }
 
+struct page_directory *get_current_directory() {
+  return current_directory;
+}
+
 static void set_current_directory(struct page_directory *dir) {
   current_directory = dir;
 }
@@ -53,11 +84,15 @@ static void set_current_directory(struct page_directory *dir) {
 void init_paging() {
   kernel_directory = kmalloc_a(sizeof(struct page_directory));
   memset(kernel_directory, 0, (sizeof(struct page_directory)));
+  boot_table = kmalloc_a(sizeof(struct page_table));
+  memset(boot_table, 0, (sizeof(struct page_table)));
+  kernel_directory->tables[0] = boot_table;
+  kernel_directory->tables_physical[0] = page_table_ptr_to_pde(boot_table);
 
   for (size_t i = 0; i < 1024; i++) {
     uintptr_t identity_ptr = i * 4096;
-    struct page *pg = get_page(identity_ptr, true, kernel_directory);
-    write_page(pg, true, true, identity_ptr);
+    struct page *pg = get_page(identity_ptr, kernel_directory);
+    write_page(pg, true, true);
   }
 
   // register our page fault handler.

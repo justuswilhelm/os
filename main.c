@@ -17,6 +17,19 @@ void test_print() {
                 255 + 1);
 }
 
+void test_paging() {
+  // this is paged in by default
+  screen_printf("The value at 0x3e0000 is %x\n", *(uint32_t *)0x3E0000);
+
+  // try creating a new page pointing to virtual 0x400000
+  // page =
+  struct page *pg = get_page(0x400000, get_current_directory());
+  write_page(pg, true, true);
+  screen_printf("The value at 0x400000 is %x\n", *(uint32_t *)0x400000);
+  screen_printf("Now triggering a page fault\n");
+  screen_printf("The value at 0x800000 is %x\n", *(uint32_t *)0x800000);
+}
+
 void test_bitset() {
   // 2 * 4 * 8 bits = 64 values
   uint32_t values[2] = {0};
@@ -48,8 +61,7 @@ void kernel_main() {
   init_paging();
   screen_clear();
   test_print();
-
-  screen_printf("The value is %x", *(uint32_t *)0xA0000000);
+  test_paging();
   // test_bitset();
 
   // init_timer(1);

@@ -42,8 +42,10 @@ struct page_directory {
 // Retrieves a pointer to the page required.
 // If make == 1, if the page-table in which this page should reside isn't
 // created, create it!
-struct page *get_page(uintptr_t address, bool make_table,
-                      struct page_directory *dir);
+struct page *get_page(uintptr_t address, struct page_directory *dir);
+void write_page(struct page *page, bool is_kernel, bool is_writeable);
+
+struct page_directory *get_current_directory();
 
 //  Sets up the environment, page directories etc and enables paging.
 void init_paging();
