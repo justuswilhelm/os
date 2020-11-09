@@ -5,7 +5,5 @@
 #include <stddef.h>
 #include <stdint.h>
 
-void *kmalloc(size_t size);
-void *kmalloc_a(size_t size);
-void *kmalloc_ap(size_t size, uintptr_t *phys);
-void *kmalloc_p(size_t size, uintptr_t *phys);
+void *kmalloc(size_t);
+void *kmalloc_a(size_t, uintptr_t);

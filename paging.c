@@ -38,7 +38,7 @@ static void *allocate_page() {
 static struct page_table *allocate_page_table(uint32_t table_idx,
                                               struct page_directory *dir) {
   // Allocate table entry in virtual memory
-  struct page_table *table = kmalloc_a(sizeof(struct page_table));
+  struct page_table *table = kmalloc_a(sizeof(struct page_table), PAGE_SIZE);
   memset(table, 0, sizeof(struct page_table));
   // Update physical pointer with identity mapped adddress
   dir->tables_physical[table_idx] = page_table_ptr_to_pde(table);
@@ -82,9 +82,9 @@ static void set_current_directory(struct page_directory *dir) {
 }
 
 void init_paging() {
-  kernel_directory = kmalloc_a(sizeof(struct page_directory));
+  kernel_directory = kmalloc_a(sizeof(struct page_directory), PAGE_SIZE);
   memset(kernel_directory, 0, (sizeof(struct page_directory)));
-  boot_table = kmalloc_a(sizeof(struct page_table));
+  boot_table = kmalloc_a(sizeof(struct page_table), PAGE_SIZE);
   memset(boot_table, 0, (sizeof(struct page_table)));
   kernel_directory->tables[0] = boot_table;
   kernel_directory->tables_physical[0] = page_table_ptr_to_pde(boot_table);

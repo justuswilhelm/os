@@ -6,6 +6,8 @@
 
 #include "isr.h"
 
+#define PAGE_SIZE 0x1000
+
 struct page {
   // Page present in memory
   uint32_t present : 1;

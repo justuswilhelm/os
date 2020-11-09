@@ -19,26 +19,27 @@ static uintptr_t get_placement_address() {
   return placement_address;
 }
 
-static void *kmalloc_internal(size_t size, bool align, uintptr_t *phys) {
-  if (align && (get_placement_address() & 0xFFFFF000)) {
-    set_placement_address((get_placement_address() & 0xFFFFF000) + 0x1000);
-  }
-  if (phys) {
-    *phys = get_placement_address();
-  }
+static void *kmalloc_internal(size_t size, uintptr_t align) {
   uintptr_t tmp = get_placement_address();
+  // Example calculation
+  // align = 4
+  // placement = 15
+  // then
+  // align_rem = 3
+  // adjustment = align - align_rem
+  // thanks to
+  // https://stackoverflow.com/a/12721849/6261168
+  if (align) {
+    uintptr_t align_rem = tmp % align;
+    if (align_rem != 0) {
+      uintptr_t adjustment = align - align_rem;
+      tmp += adjustment;
+    }
+  }
   set_placement_address(tmp + size);
   return (void *)tmp;
 }
 
-void *kmalloc(size_t size) { return kmalloc_internal(size, false, 0); }
+void *kmalloc(size_t size) { return kmalloc_internal(size, false); }
 
-void *kmalloc_a(size_t size) { return kmalloc_internal(size, true, 0); }
-
-void *kmalloc_ap(size_t size, uintptr_t *phys) {
-  return kmalloc_internal(size, true, phys);
-}
-
-void *kmalloc_p(size_t size, uintptr_t *phys) {
-  return kmalloc_internal(size, false, phys);
-}
+void *kmalloc_a(size_t size, uintptr_t align) { return kmalloc_internal(size, align); }
