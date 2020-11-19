@@ -21,8 +21,13 @@ struct page_directory *current_directory = NULL;
 uint32_t pages_bitset_bits[BITSET_SIZE(1024 * 4)] = {0};
 struct bitset pages_bitset = {.values = pages_bitset_bits, .size = 1024 * 4};
 
-static uint32_t page_table_ptr_to_pde(void *table) {
-  return (((uint32_t)table) & 0xfffff000) | 0x7;
+static struct page_directory_entry page_table_ptr_to_pde(void *table) {
+  return (struct page_directory_entry){
+      .present = 1,
+      .rw = 1,
+      .user = 1,
+      .address = (uint32_t)table >> 12,
+  };
 }
 
 // Return memory address of new page

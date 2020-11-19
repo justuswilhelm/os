@@ -15,12 +15,20 @@ struct page {
   uint32_t rw : 1;
   // Supervisor level only if clear
   uint32_t user : 1;
+  // Page-level write-through;
+  uint32_t pwt : 1;
+  // Page-level cache disable;
+  uint32_t pcd : 1;
   // Has the page been accessed since last refresh?
   uint32_t accessed : 1;
   // Has the page been written to since last refresh?
   uint32_t dirty : 1;
-  // Amalgamation of unused and reserved bits
-  uint32_t unused : 7;
+  // PAT value
+  uint32_t pat : 1;
+  // Global translation
+  uint32_t g : 1;
+  // Ignored
+  uint32_t ignored : 3;
   // Frame address (shifted right 12 bits)
   uint32_t frame : 20;
 };
@@ -29,10 +37,33 @@ struct page_table {
   struct page pages[1024];
 };
 
+struct page_directory_entry {
+  // Is this entry present?
+  uint32_t present : 1;
+  // Is this writeable?
+  uint32_t rw : 1;
+  // If 0, user-mode accesses are not allowed
+  uint32_t user : 1;
+  // Page-level write-through;
+  uint32_t pwt : 1;
+  // Page-level cache disable;
+  uint32_t pcd : 1;
+  // Has the page been accessed since last refresh?
+  uint32_t accessed : 1;
+  // Ignored
+  uint32_t ignored : 1;
+  // Set to zero
+  uint32_t zero : 1;
+  // Amalgamation of unused and reserved bits
+  uint32_t unused : 4;
+  // Frame address (shifted right 12 bits)
+  uint32_t address : 20;
+};
+
 struct page_directory {
   // Array of pointers to the pagetable above, but given their physical
   // location, for loading into the CR3 register.
-  uint32_t tables_physical[1024];
+  struct page_directory_entry tables_physical[1024];
   // Array of pointers to pagetable
   struct page_table *tables[1024];
   // The physical address of tablesPhysical. This comes into play when we get
