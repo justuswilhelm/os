@@ -16,7 +16,7 @@ jobs:
       - run:
           name: Create cross-compilation toolchain
           command: |
-            make -C toolchain
+            make toolchain
       - save_cache:
           paths:
             - ./toolchain
