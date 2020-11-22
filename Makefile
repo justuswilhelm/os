@@ -2,6 +2,8 @@ CFLAGS = -std=gnu99 -ffreestanding -g -Wall -Wextra -Werror -Wpedantic
 CC = toolchain/bin/i386-elf-gcc
 AS = toolchain/bin/i386-elf-as
 GDB = toolchain/bin/i386-elf-gdb
+QEMU = qemu-system-i386
+QEMU_DEBUG_FLAGS = -s -S -d int -no-reboot -no-shutdown
 
 SRC_PATH = src
 
@@ -35,10 +37,10 @@ OBJS = \
 all: os.bin
 
 qemu: os.bin
-	qemu-system-i386 -kernel $<
+	$(QEMU) -kernel $<
 
 qemu-debug: os.bin
-	qemu-system-i386 -kernel $< -s -S -d int -no-reboot -no-shutdown
+	$(QEMU) -kernel $< $(QEMU_DEBUG_FLAGS)
 
 debug: os.bin
 	$(GDB) -d int
