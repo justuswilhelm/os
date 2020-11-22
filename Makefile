@@ -1,4 +1,4 @@
-CFLAGS = -std=gnu99 -ffreestanding -g -Wall -Wextra -Werror
+CFLAGS = -std=gnu99 -ffreestanding -g -Wall -Wextra -Werror -Wpedantic
 CC = toolchain/bin/i386-elf-gcc
 AS = toolchain/bin/i386-elf-as
 GDB = toolchain/bin/i386-elf-gdb
