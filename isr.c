@@ -5,5 +5,10 @@
 
 // This gets called from our ASM interrupt handler stub.
 void isr_handler(struct registers regs) {
-  screen_printf("recieved interrupt: %x\n", regs.int_no);
+  if (interrupt_handlers[regs.int_no] != 0) {
+    isr_t handler = interrupt_handlers[regs.int_no];
+    handler(regs);
+  } else {
+    screen_printf("received interrupt: 0x%02x\n", regs.int_no);
+  }
 }

@@ -14,6 +14,8 @@ The following libraries are required to build GCC
 ```
 brew tap hawkw/homebrew-grub
 brew install objconv
+# For GCC
+brew install gmp mpfr libmpc
 ```
 
 ### Debian Prerequisities
@@ -28,4 +30,11 @@ sudo apt install libgmp-dev libmpfr-dev libmpc-dev zlib1g-dev
 
 ```
 make toolchain -j 16
+```
+
+## Object dump
+
+```
+make
+objdump --disassemble --print-imm-hex os.bin | less
 ```

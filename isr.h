@@ -47,3 +47,7 @@ void isr28();
 void isr29();
 void isr30();
 void isr31();
+
+// Enables registration of callbacks for interrupts or IRQs.
+typedef void (*isr_t)(struct registers);
+extern isr_t interrupt_handlers[256];

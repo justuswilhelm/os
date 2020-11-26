@@ -83,7 +83,17 @@ struct print_ctx {
   bool has_minimum_width;
   int minimum_width;
   enum { ZERO, SPACE } padding;
+  bool always_sign;
+  bool is_negative;
 };
+
+static void print_sign(void put(const char), struct print_ctx *ctx) {
+  if (ctx->is_negative) {
+    put('-');
+  } else if (ctx->always_sign) {
+    put('+');
+  }
+}
 
 static void print_padding(void put(const char), size_t length,
                           struct print_ctx *ctx) {
@@ -109,11 +119,12 @@ static void print_padding(void put(const char), size_t length,
   }
 }
 
-static void print_hex(void put(const char), int number, struct print_ctx *ctx) {
+static void print_hex(void put(const char), unsigned int number,
+                      struct print_ctx *ctx) {
   char buffer[CONVERSION_BUFFER_SIZE] = {0};
   size_t buffer_pos = 0;
   if (number == 0) {
-    buffer[0] = 'A';
+    buffer[0] = '0';
     buffer_pos++;
   } else {
     for (; number > 0; buffer_pos++) {
@@ -144,6 +155,10 @@ static void print_number(void put(const char), int number,
                          struct print_ctx *ctx) {
   char buffer[CONVERSION_BUFFER_SIZE] = {0};
   size_t buffer_pos = 0;
+  if (number < 0) {
+    ctx->is_negative = true;
+    number = -number;
+  }
   if (number == 0) {
     buffer_pos++;
     buffer[0] = '0';
@@ -159,6 +174,7 @@ static void print_number(void put(const char), int number,
 
   buffer_pos--;
 
+  print_sign(put, ctx);
   print_padding(put, buffer_pos, ctx);
 
   for (size_t printed = 0; printed <= buffer_pos; printed++) {
@@ -212,7 +228,7 @@ static void printf(void puts(const char *), void put(const char),
       }
     } else if (state == FORMAT_END) {
       if (c == 'x') {
-        int number = va_arg(args, int);
+        int number = va_arg(args, unsigned int);
         print_hex(put, number, &ctx);
         state = NO_FORMAT;
       } else if (c == 'd') {

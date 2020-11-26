@@ -1,6 +1,7 @@
 CFLAGS = -std=gnu99 -ffreestanding -g -Wall -Wextra -Werror
 CC = toolchain/bin/i386-elf-gcc
 AS = toolchain/bin/i386-elf-as
+GDB = toolchain/bin/i386-elf-gdb
 
 SRC_PATH = src
 
@@ -11,14 +12,18 @@ AS_SRCS = \
 	irq_s.s \
 
 C_SRCS = \
+	bitset.c \
 	cpu.c \
 	gdt.c \
 	idt.c \
 	irq.c \
 	isr.c \
 	keyboard.c \
+	kheap.c \
 	main.c \
+	paging.c \
 	screen.c \
+	string.c \
 	timer.c \
 
 OBJS = \
@@ -32,11 +37,17 @@ all: os.bin
 qemu: os.bin
 	qemu-system-i386 -kernel $<
 
+qemu-debug: os.bin
+	qemu-system-i386 -kernel $< -s -S -d int -no-reboot -no-shutdown
+
+debug: os.bin
+	$(GDB) -d int
+
 depend: .depend
 
 .depend: $(C_SRCS)
-	rm -f ./.depend
-	$(CC) $(CFLAGS) -MM $^ -MF  ./.depend
+	rm -f $@
+	$(CC) $(CFLAGS) -MM $^ -MF $@
 
 include .depend
 
