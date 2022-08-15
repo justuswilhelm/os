@@ -16,6 +16,7 @@ AS_SRCS = \
 C_SRCS = \
 	bitset.c \
 	cpu.c \
+	fs.c \
 	gdt.c \
 	idt.c \
 	irq.c \
@@ -23,6 +24,7 @@ C_SRCS = \
 	keyboard.c \
 	kheap.c \
 	main.c \
+	multiboot.c \
 	paging.c \
 	screen.c \
 	string.c \
@@ -37,10 +39,10 @@ OBJS = \
 all: os.bin
 
 qemu: os.bin
-	$(QEMU) -kernel $<
+	$(QEMU) -kernel $< -initrd initrd.dmg
 
 qemu-debug: os.bin
-	$(QEMU) -kernel $< $(QEMU_DEBUG_FLAGS)
+	$(QEMU) -kernel $< $(QEMU_DEBUG_FLAGS) -initrd initrd.dmg
 
 debug: os.bin
 	$(GDB) -d int
@@ -64,3 +66,7 @@ clean:
 
 format:
 	clang-format -i *.c *.h
+
+initrd.dmg:
+	# macOS specific
+	hdiutil create -size 16m -fs 'MS-DOS FAT16' $@

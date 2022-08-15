@@ -14,12 +14,13 @@ struct page_table *boot_table = NULL;
 struct page_directory *kernel_directory = NULL;
 struct page_directory *current_directory = NULL;
 
+#define PAGES_REQUIRED 0x1200
+
 // How many pages do we want to make available?
-// Static for now
-// 4 * 4 MiB
-// This will result in 128 bytes being allocated
-uint32_t pages_bitset_bits[BITSET_SIZE(1024 * 4)] = {0};
-struct bitset pages_bitset = {.values = pages_bitset_bits, .size = 1024 * 4};
+// 1 byte covers 8 pages, so for example 1024 pages will require 128 bit
+uint32_t pages_bitset_bits[BITSET_SIZE(PAGES_REQUIRED)] = {0};
+struct bitset pages_bitset = {.values = pages_bitset_bits,
+                              .size = PAGES_REQUIRED};
 
 static struct page_directory_entry page_table_ptr_to_pde(void *table) {
   return (struct page_directory_entry){
@@ -37,7 +38,7 @@ static void *allocate_page() {
     PANIC("No pages available");
   }
   bitset_set(&pages_bitset, result.index);
-  return (void *)(result.index * 4096);
+  return (void *)(result.index * PAGE_SIZE);
 }
 
 static struct page_table *allocate_page_table(uint32_t table_idx,
@@ -94,8 +95,8 @@ void init_paging() {
   kernel_directory->tables[0] = boot_table;
   kernel_directory->tables_physical[0] = page_table_ptr_to_pde(boot_table);
 
-  for (size_t i = 0; i < 1024; i++) {
-    uintptr_t identity_ptr = i * 4096;
+  for (size_t i = 0; i < PAGES_REQUIRED; i++) {
+    uintptr_t identity_ptr = i * PAGE_SIZE;
     struct page *pg = get_page(identity_ptr, kernel_directory);
     write_page(pg, true, true);
   }

@@ -7,3 +7,4 @@
 
 void *kmalloc(size_t);
 void *kmalloc_a(size_t, uintptr_t);
+void set_heap_start(uintptr_t);

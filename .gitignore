@@ -2,6 +2,7 @@
 *.bin
 *.o
 *.tar.gz
+*.dmg
 .gdb_history
 toolchain/bin/
 toolchain/binutils-*/

@@ -22,8 +22,11 @@ stack_top:
 .section .text
 
 start:
-  push %ebx
   mov $stack_top, %esp
+  pushl $0
+  popf
+  pushl %ebx
+  pushl %eax
   call kernel_main
   cli
 hang:

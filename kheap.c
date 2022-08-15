@@ -5,16 +5,22 @@
 #include <stdint.h>
 
 #include "kheap.h"
-
-void kernel_end(void);
+#include "screen.h"
 
 static uintptr_t placement_address = 0;
+
+void set_heap_start(uintptr_t val) {
+  if (placement_address) {
+    PANIC("Heap start already set");
+  }
+  placement_address = val;
+}
 
 static void set_placement_address(uintptr_t val) { placement_address = val; }
 
 static uintptr_t get_placement_address() {
   if (placement_address == 0) {
-    placement_address = (uint32_t)&kernel_end;
+    PANIC("Did not set placement address");
   }
   return placement_address;
 }

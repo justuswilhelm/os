@@ -1,6 +1,7 @@
 /* Inspired by https://wiki.osdev.org/User:Zesterer/Bare_Bones#kernel.c */
 
 #include "bitset.h"
+#include "fs.h"
 #include "gdt.h"
 #include "idt.h"
 #include "keyboard.h"
@@ -9,12 +10,21 @@
 #include "screen.h"
 #include "timer.h"
 
-void test_print() {
-  screen_printf("Hello, %s\n", "World");
-  screen_printf("The answer is %4d\n", 42);
-  screen_printf("Printing negative numbers! %04d\n", -42);
-  screen_printf("And in hexadecimal, 255 + 1 : %02x + %02x = %04x\n", 255, 1,
-                255 + 1);
+void kernel_end(void);
+
+void check_initrd(struct multiboot_info *mbi) {
+  uintptr_t heap_start = 0;
+  for (unsigned i = 0; i < mbi->mods_count; i++) {
+    struct multiboot_mod_list *mod = get_multiboot_module(mbi, i);
+    screen_printf("Multiboot module %s at [0x%x, 0x%x]\n", mod->cmdline,
+                  mod->mod_start, mod->mod_end);
+    heap_start = mod->mod_end;
+  }
+  if (heap_start == 0) {
+    heap_start = (uint32_t)&kernel_end;
+  }
+  screen_printf("Placing heap at 0x%x\n", heap_start);
+  set_heap_start(heap_start);
 }
 
 void test_paging() {
@@ -54,14 +64,26 @@ void test_bitset() {
   screen_printf("Test 63: %d\n", bitset_test(&bs, 63));
 }
 
-// void kernel_main(struct multiboot *mboot_ptr) {
-void kernel_main() {
+void test_fs() {
+  struct file *file = open("test.txt");
+  screen_printf("open() returns: 0x%x\n", file);
+  char buffer[32] = {0};
+  size_t ret = read(file, buffer, 12);
+  screen_printf("read(): %d, %s\n", ret, buffer);
+}
+
+// void kernel_main() {
+void kernel_main(uint32_t magic, struct multiboot_info *mboot_ptr) {
+  if (magic != MULTIBOOT_BOOTLOADER_MAGIC) {
+    screen_printf("Invalid bootloader magic: 0x%x", magic);
+  }
   init_gdt();
   init_idt();
-  init_paging();
   screen_clear();
-  test_print();
-  test_paging();
+  check_initrd(mboot_ptr);
+  init_paging();
+  test_fs();
+  // test_paging();
   // test_bitset();
 
   // init_timer(1);
